@@ -1,0 +1,29 @@
+# If you want to add a custom colour, you can use the '--add-colour' paramater with the arguments '"name" r g b'
+#  this is the safest way to add a custom colour.
+#
+# If you want to manually add custom colours please format it like so:
+#  COLOURNAME = "r, g, b".
+#  please make sure the name is CAPITALIZED and has no spaces or special characters.
+
+WHITE = "255, 255, 255"
+BLACK = "0, 0, 0"
+GREY = "178, 190, 181"
+RED = "255, 0, 0"
+GREEN = "0, 255, 0"
+BLUE = "0, 0, 255"
+MAROON = "128, 0, 0"
+LIMEGREEN = "50, 205, 50"
+TEAL = "0, 128, 128"
+LIGHTBLUE = "128, 216, 240"
+YELLOW = "255, 255, 0"
+AMBER = "255, 191, 0"
+ORANGE = "255, 170, 0"
+OLIVE = "153, 153, 0"
+TAN = "210, 180, 140"
+PURPLE = "128, 0, 128"
+LIGHTPURPLE = "204, 135, 232"
+OPERAMAUVE = "178, 132, 190"
+FUCHSIA = "255, 0, 255"
+PINK = "255, 192, 203"
+CYAN = "0, 255, 255"
+SILVER = "192, 192, 192"

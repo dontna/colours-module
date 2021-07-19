@@ -1,0 +1,29 @@
+Welcome to Pete's Color Python Script.
+
+To use the script simply add it to your project directory and import it.
+
+This script containts 3 main functions that you will use, they are:
+
+- cprint
+- print_all_colours
+- add_custom_colour
+
+cprint - Like 'print' however you can specify a main colour and an alt colour which will allow you to print coloured text to the terminal.
+         to use this command simply type 'cprint("name of the colour", "the text to print", [optinal]alt_colour)'.
+         To use the alt colour you will simply insert 2 '.#'. The first will be where you want the alt colour to start and the second will be
+         where the alt colour will end.
+
+         EXAMPLE: cprint(colour_name='red', alt_colour='light blue', text_to_print='This will be red .# and this will be light blue.# and now we are back to red.')
+
+         You can enter this symbol multiple times, but always remember to wrap the text you want to colourize with 2 of '.#'
+
+print_all_colours - Loops through the 'colours.txt' and will print out every colour with the colour's name. This includes custom colours 
+                    added with the 'add_custom_colour' function.
+
+add_custom_colour - Allows the user to specify a custom colour to add to their 'colours.txt' file, allowing them to use it whenever they like.
+                    The function takes 4 arguments, colour_name, r, g, and b. 
+                    The 'colour_name' is a custom name for the new colour, which the user will use anytime they want to use this colour.
+                    The 'r', 'g' and 'b' values are the RGB values respectively. If you have trouble figuring out an RGB value, you can goto
+                    "https://rgbcolorcode.com/" and simply copy the RGB values of the colour you want to have. If you want to create a custom
+                    colour or simply do not know the name, you can use 'W3Schools Color Picker' (https://www.w3schools.com/colors/colors_picker.asp)
+                    to create your own perfect colours!
