@@ -23,22 +23,19 @@ class Colours:
         
         Returns the R, G, B values in an set."""
 
-        # Removes spaces and sets the text to all caps, for easier comparison.
         our_colour_name = self.__tag_format_name(our_colour_name)
 
         with open("colours.txt", "r") as f:
             for line in f.readlines():
                 if line[0] == "#" or line[0] == None:
                     continue
-                # Grab only the name from the file.
                 file_colour_name = line[0:line.find(' ')]
 
-                # When we are on the right line, copy the RGB data.
                 if file_colour_name == our_colour_name:
                     first_quote = int(line.find('"') + 1)
                     last_quote = int(line.rfind('"'))
 
-                    # Format it as an set for easier unpacking later.
+                    # Format it as a set for easier unpacking later.
                     rgb_value = line[first_quote:last_quote].replace(' ', '').split(',')
 
         return rgb_value
@@ -47,20 +44,16 @@ class Colours:
         """Checks to see if the colour is in the 'colours.txt' file, 
         
         Returns: bool"""
-        # Removes spaces and sets the text to all caps, for easier comparison.
         colour_to_check = self.__tag_format_name(colour_to_check)
 
         with open("colours.txt", 'r') as f:
             for line in f.readlines():
-                # Grab only the name from the file.
                 colour_name = line[0:line.find(' ')]
 
-                # If the colour_to_check is in the file, then return true. 
                 if colour_to_check == colour_name:
                     return True
                 else:
                     continue
-        # If colour_to_check is not in the file, then return false.
         return False
     def __is_tag_valid(self, tag_to_check):
             """Compares the tag with an set of valid tags, to see if the tag is valid. 
@@ -97,7 +90,7 @@ class Colours:
         Returns: text_with_tags_applied
         """
 
-        # Special Tags Vars (for easier coding)
+        # Special Tags Vars
         SETBOLD = "\033[1m"
         UNSETBOLD = "\033[22m"
 
@@ -243,10 +236,8 @@ class Colours:
             for i,line in enumerate(f.readlines()):
                 if line[0] == "#" or line[0] == None or line == "\n":
                     continue
-                # Set the 'default colours' header on the first line.
                 if i == 7:
                     self.cprint('[<blink>DEFAULT COLOURS</blink>]')
-                # Set the custom colours header on the 22nd line.
                 elif i == 29:
                     self.cprint('\n[<blink>CUSTOM COLOURS</blink>]')
                 colour_name = line[0:line.find(' ')]
