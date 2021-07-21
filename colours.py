@@ -4,26 +4,23 @@ import sys
 
 class Colours:
     # Private Methods
-    def __get_background_colour(self, background_colour_name):
-        """Gets the RGB value of the background colour.
+    def _colour_to_escape_sequence(self, colour_name, foreground_colour=True):
+        """Gets either the RGB value and creates an ANSI Escape String
         
-        Returns the string to apply specified background colour."""
-        r, g, b = self.__get_rgb_value(background_colour_name)
+        Returns: ANSI Escape Sequence"""
 
-        return f"\033[48;2;{r};{g}{b}m" #The ANSI escape sequence for the background colour.
-    def __get_foreground_colour(self, foreground_colour_name):
-        """Gets the RGB value of the colour, and returns the formatted foreground string.
-        
-        Returns the string to apply specified foreground colour."""
-        r, g, b = self.__get_rgb_value(foreground_colour_name)
+        r, g, b = self._get_rgb_value(colour_name)
 
-        return f"\033[38;2;{r};{g};{b}m" #The ANSI escape sequence for the foreground colour.
-    def __get_rgb_value(self, our_colour_name):
+        if foreground_colour:
+            return f"\033[38;2;{r};{g};{b}m"
+        else:
+            return f"\033[48;2;{r};{g}{b}m"
+    def _get_rgb_value(self, our_colour_name):
         """Gets the RGB value of the colour from the 'colours.txt' file.
         
         Returns the R, G, B values in an set."""
 
-        our_colour_name = self.__tag_format_name(our_colour_name)
+        our_colour_name = self._tag_format_name(our_colour_name)
 
         with open("colours.txt", "r") as f:
             for line in f.readlines():
@@ -32,41 +29,50 @@ class Colours:
                 file_colour_name = line[0:line.find(' ')]
 
                 if file_colour_name == our_colour_name:
-                    first_quote = int(line.find('"') + 1)
-                    last_quote = int(line.rfind('"'))
+                    first_quote, last_quote = int(line.find('"') + 1), int(line.rfind('"'))
 
                     # Format it as a set for easier unpacking later.
                     rgb_value = line[first_quote:last_quote].replace(' ', '').split(',')
 
         return rgb_value
 
-    def __is_colour_valid(self, colour_to_check):
+    def _is_colour_valid(self, colour_to_check):
         """Checks to see if the colour is in the 'colours.txt' file, 
         
         Returns: bool"""
-        colour_to_check = self.__tag_format_name(colour_to_check)
+        colour_to_check = self._tag_format_name(colour_to_check)
+
+        colours = []
 
         with open("colours.txt", 'r') as f:
             for line in f.readlines():
                 colour_name = line[0:line.find(' ')]
 
-                if colour_to_check == colour_name:
-                    return True
-                else:
-                    continue
-        return False
-    def __is_tag_valid(self, tag_to_check):
+                colours.append(colour_name)
+        
+        return colour_to_check in colours
+
+    def _is_tag_valid(self, tag_to_check, check_colour=False):
             """Compares the tag with an set of valid tags, to see if the tag is valid. 
             
             Returns: bool"""
-            tags = ['b', 'ul', 'i', 'blink', 'sblink', 'cross', 'faint', r'/b', r'/ul', r'/i', r'/blink', r'/sblink', r'/cross', r'/faint']
-            
-            if tag_to_check in tags:
-                return True
-            else:
-                return False
 
-    def __tag_format_name(self, tag):
+            if not check_colour:
+                tags = ['b', 'ul', 'i', 'blink', 'sblink', 'cross', 'faint', r'/b', r'/ul', r'/i', r'/blink', r'/sblink', r'/cross', r'/faint']
+                
+                return tag_to_check in tags
+            else:
+                colour_to_check = self._tag_format_name(tag_to_check)
+
+                colours = []
+
+                with open("colours.txt", 'r') as f:
+                    for line in f.readlines():
+                        colours.append(line[0:line.find(' ')])
+                
+                return colour_to_check in colours
+
+    def _tag_format_name(self, tag):
         """Automatically Formats a tag for a specific purpose, depending what is included in the tag.
         
         Returns the formatted text"""
@@ -75,7 +81,7 @@ class Colours:
             return tag.replace('<', '').replace('>', '')
 
         return tag.replace(' ', '').upper()
-    def __tag_handle_special(self, text):
+    def _tag_handle_special(self, text):
         """Removes the special tags from the text and makes them functional
         
         Special Tags:
@@ -113,47 +119,46 @@ class Colours:
         tags = re.findall(r'\<[\w /]+\>', text)
 
         for tag in tags:
-            tag_name = tag.replace('<', '').replace('>','')
+            formatted_tag_name = self._tag_format_name(tag)
 
-            if self.__is_tag_valid(tag_name) == False:
-                del tag
+            if self._is_tag_valid(formatted_tag_name) == False:
                 continue
             
             # Start disgusting elif check, because I have no idea how to optimise it.
-            if tag_name == "b" or tag_name == "/b":
+            if formatted_tag_name == "b":
                 text = text.replace(r'<b>', SETBOLD)
                 text = text.replace(r'</b>', UNSETBOLD)
-                break
+                
 
-            elif tag_name == "blink" or tag_name == r"/blink":
+            elif formatted_tag_name == "blink":
                 text = text.replace(r'<blink>', SETBLINK)
                 text = text.replace(r'</blink>', UNSETBLINK)
-                break
+                
 
-            elif tag_name == "sblink" or tag_name == r"/sblink":
+            elif formatted_tag_name == "sblink":
                 text = text.replace(r'<sblink>', SETSLOWBLINK)
                 text = text.replace(r'</sblink>', UNSETBLINK)
-                break
+                
 
-            elif tag_name == "ul" or tag_name == r"/ul":
+            elif formatted_tag_name == "ul":
                 text = text.replace(r'<ul>', SETUNDERLINE)
                 text = text.replace(r'</ul>', UNSETUNDERLINE)
-                break
+                
 
-            elif tag_name == "i" or tag_name == r"/i":
+            elif formatted_tag_name == "i":
                 text = text.replace(r'<i>', SETITALIC)
                 text = text.replace(r'</i>', UNSETITALIC)
-                break
+                
 
-            elif tag_name == "cross" or tag_name == r"/cross":
+            elif formatted_tag_name == "cross":
                 text = text.replace(r'<cross>', SETCROSSED)
                 text = text.replace(r'</cross>', UNSETCROSSED)
-                break
+                
 
-            elif tag_name == "faint" or tag_name == r"/faint":
+            elif formatted_tag_name == "faint":
                 text = text.replace(r'<faint>', SETFAINT)
                 text = text.replace(r'</faint>', UNSETFAINT)
-                break
+                
 
         return text
 
@@ -196,35 +201,35 @@ class Colours:
             default_colour = DEFAULTFG
         else:
             # Setting the default_colour ANSI escape sequence.
-            default_r, default_g, default_b = self.__get_rgb_value(default_colour_name)
+            default_r, default_g, default_b = self._get_rgb_value(default_colour_name)
             default_colour = f"\033[38;2;{default_r};{default_g};{default_b}m"
 
         tags = re.findall(r'\<[\w ]+\>', text_to_print)
 
         if not ignore_tags:
             for tag in tags:
-                tag_name = self.__tag_format_name(tag) #Removes '<>' from tag.
+                formatted_tag_name = self._tag_format_name(tag) #Removes '<>' from tag.
 
-                if tag_name == "def" or tag_name == "default":
-                    text_to_print = text_to_print.replace(f'<{tag_name}>', default_colour)
+                if formatted_tag_name == "def" or formatted_tag_name == "default":
+                    text_to_print = text_to_print.replace(f'<{formatted_tag_name}>', default_colour)
                     continue
                 
-                is_valid_colour = self.__is_colour_valid(tag_name)
-                is_tag_valid = self.__is_tag_valid(tag_name)
+                is_valid_colour = self._is_tag_valid(formatted_tag_name, check_colour=True)
+                is_tag_valid = self._is_tag_valid(formatted_tag_name)
 
                 if not is_valid_colour and not is_tag_valid:
                     print(f"'{tag}' is NOT a valid colour/tag in the list. Please add it, or check the spelling.")
                     return False
                 elif is_valid_colour:
-                    mask = self.__get_foreground_colour(tag_name) # the ANSI escape sequence for the RGB colour.
-                    text_to_print = text_to_print.replace(f"<{tag_name}>", mask)
+                    mask = self._colour_to_escape_sequence(formatted_tag_name) # the ANSI escape sequence for the RGB colour.
+                    text_to_print = text_to_print.replace(f"<{formatted_tag_name}>", mask)
         
         if background_colour_name == "DEFAULT":
             background_colour = DEFAULTBG
         else:
-            background_colour = self.__get_background_colour(background_colour_name)
+            background_colour = self._colour_to_escape_sequence(background_colour_name, foreground_colour=False)
 
-        text_to_print = self.__tag_handle_special(text_to_print)
+        text_to_print = self._tag_handle_special(text_to_print)
 
         # Concatenate all of the options together, resulting in coloured text that does not effect any other lines.
         print(background_colour + default_colour + text_to_print + RESETALL) 
@@ -261,7 +266,7 @@ class Colours:
                 self.cprint("[<red>ERROR<def>] RGB Values can not exceed 255 or drop below 0")
                 return
         
-        colour_name = self.__tag_format_name(colour_name)
+        colour_name = self._tag_format_name(colour_name)
         with open("colours.txt", 'r') as f:
             for line in f.readlines():
                 line_colour = line[0:line.find(' ')]
@@ -299,7 +304,6 @@ help_me_pls = _inst.help_me_pls
 
 if not os.path.isfile(f"{os.getcwd()}/colours.txt"):
     Colours()._create_main_file()
-    cprint("[<green><b>SUCESS</b><def>] <amber>'colours.txt'<def> created! Coloured text now works!")
 
 if __name__ == "__main__":
     if len(sys.argv) == 2:
@@ -315,3 +319,6 @@ if __name__ == "__main__":
             r, g, b = sys.argv[3:]
         else:
             cprint(f'[<sblink><b><red>ERROR</b></sblink><def>] "<b><red>{sys.argv[1]}</b><def>" is not a valid argument.')
+
+cprint('<b>bold</b>')
+cprint('<red>bold')
